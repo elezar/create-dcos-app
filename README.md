@@ -46,9 +46,10 @@ Running the command:
 $ create-dcos-app build application.yml
 ```
 (where `applcition.yml` is the YAML definition of the application)
-will perform result in the following:
+will result in the following:
 
-The binaries (e.g. scheduler, CLI) will
+The binaries (e.g. scheduler, CLI) will be built. The files from each of the sections of the YAML file (see `template.yml`)
+will be generated.
 
 
 
