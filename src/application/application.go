@@ -43,6 +43,7 @@ func (c *Application) SetDefaults() {
 
 	defaultPackage := pkg.GetDefaultPackage()
 	defaultPackage.Name = c.Name
+	defaultPackage.Maintainer = c.Maintainer
 	defaultPackage.Description = c.Title
 	fmt.Println(defaultPackage)
 	c.Package.SetDefaults(defaultPackage)

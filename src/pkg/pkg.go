@@ -36,14 +36,15 @@ type Package struct {
 	MinDcosReleaseVersion string   `json:"minDcosReleaseVersion"`
 	UpgradesFrom          []string `json:"upgradesFrom"`
 	DowngradesTo          []string `json:"DowngradesTo"`
-	Selected              bool
-	Framework             bool
-	Description           string
-	Maintainer            string
-	Tags                  []string
-	PreInstallNotes       string
-	PostInstallNotes      string
-	PostUninstallNotes    string
+	Selected              bool     `json:"selected"`
+	Framework             bool     `json:"framework"`
+	Description           string   `json:"description"`
+	Maintainer            string   `json:"maintainer"`
+	Version               string   `json:"version"`
+	Tags                  []string `json:"tags"`
+	PreInstallNotes       string   `json:"preInstallNotes"`
+	PostInstallNotes      string   `json:"postInstallNotes"`
+	PostUninstallNotes    string   `json:"postUninstallNotes"`
 }
 
 // NewPackage constructs a new package with default values
@@ -62,6 +63,16 @@ func (c *Package) ParseYaml(data []byte) error {
 	return nil
 }
 
+func generateDefaultActionString(formatString string, names []string, defaultString string) string {
+	for _, name := range names {
+		if name != "" {
+			return fmt.Sprintf(formatString, name)
+		}
+	}
+
+	return defaultString
+}
+
 func (c *Package) SetDefaults(defaultPackage Package) {
 	if c.Name == "" {
 		c.Name = defaultPackage.Name
@@ -72,6 +83,9 @@ func (c *Package) SetDefaults(defaultPackage Package) {
 		} else {
 			c.Description = c.Name
 		}
+	}
+	if c.Maintainer == "" {
+		c.Maintainer = defaultPackage.Maintainer
 	}
 	if c.PackagingVersion == "" {
 		c.PackagingVersion = defaultPackage.PackagingVersion
@@ -92,24 +106,22 @@ func (c *Package) SetDefaults(defaultPackage Package) {
 			c.Tags = []string{c.Name}
 		}
 	}
+	if c.Version == "" {
+		c.Version = defaultPackage.Version
+	}
+
 	if c.PreInstallNotes == "" {
 		c.PreInstallNotes = defaultPackage.PreInstallNotes
 	}
 
+	nameList := []string{c.Description, c.Name}
+
 	if c.PostInstallNotes == "" {
-		if defaultPackage.PostInstallNotes != "" {
-			c.PostInstallNotes = defaultPackage.PostInstallNotes
-		} else if c.Description != "" {
-			c.PostInstallNotes = fmt.Sprintf("The DC/OS %s service is being installed", c.Description)
-		}
+		c.PostInstallNotes = generateDefaultActionString("The DC/OS %s service is being installed.", nameList, defaultPackage.PostInstallNotes)
 	}
 
 	if c.PostUninstallNotes == "" {
-		if defaultPackage.PostUninstallNotes != "" {
-			c.PostUninstallNotes = defaultPackage.PostUninstallNotes
-		} else if c.Description != "" {
-			c.PostUninstallNotes = fmt.Sprintf("The DC/OS %s service is being uninstalled", c.Description)
-		}
+		c.PostUninstallNotes = generateDefaultActionString("The DC/OS %s service is being uninstalled.", nameList, defaultPackage.PostUninstallNotes)
 	}
 
 }
@@ -120,7 +132,10 @@ func GetDefaultPackage() Package {
 	p.PackagingVersion = DefaultPackagingVerison
 	p.UpgradesFrom = []string{"{{upgrades-from}}"}
 	p.DowngradesTo = []string{"{{downgrades-to}}"}
+	p.Version = "{{package-version}}"
 	p.Framework = true
+	p.PostInstallNotes = "The DC/OS service is being installed."
+	p.PostUninstallNotes = "The DC/OS service is being uninstalled."
 	return p
 }
 

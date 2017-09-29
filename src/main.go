@@ -1,11 +1,34 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/elezar/create-dcos-app/src/application"
 )
+
+func generateConfigJson(a application.Application, outputPath string) {
+	log.Println("TODO: Generate config.json")
+}
+
+func generateMarathonJsonMustache(a application.Application, outputPath string) {
+	log.Println("TODO: Generate Marathon.json.mustache")
+}
+
+func generatePackageJson(a application.Application, outputPath string) {
+	log.Println("Generating package.json")
+	err := a.Package.WriteToJsonFile(outputPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func generateResourceJson(a application.Application, outputPath string) {
+	log.Println("TODO: Generate resource.json")
+}
+
+func generateSvcYaml(a application.Application, outputPath string) {
+	log.Println("TODO: Generate resource.json")
+}
 
 func main() {
 	inputFilename := "../examples/minimal/application.yml"
@@ -16,11 +39,11 @@ func main() {
 		log.Fatal("Error loading application", err)
 	}
 
-	fmt.Println("Loaded application:")
-	fmt.Print(application)
+	generateConfigJson(application, outputPath)
+	generateMarathonJsonMustache(application, outputPath)
+	generatePackageJson(application, outputPath)
+	generateResourceJson(application, outputPath)
 
-	err = application.Package.WriteToJsonFile(outputPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	generateSvcYaml(application, outputPath)
+
 }
