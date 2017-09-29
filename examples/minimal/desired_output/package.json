@@ -1,0 +1,22 @@
+{
+    "packagingVersion": "4.0",
+    "upgradesFrom": [
+        "{{upgrades-from}}"
+    ],
+    "downgradesTo": [
+        "{{downgrades-to}}"
+    ],
+    "minDcosReleaseVersion": "1.9",
+    "name": "minimal-app",
+    "version": "{{package-version}}",
+    "maintainer": "support@somewhere.com",
+    "description": "Minimal App",
+    "selected": false,
+    "framework": true,
+    "tags": [
+        "minimal-app"
+    ],
+    "preInstallNotes": "TODO: Add default preInstallNotes",
+    "postInstallNotes": "TODO: Add default postInstallNotes that contain \"Minimal App\" (application.title)",
+    "postUninstallNotes": "TODO: Add default postUninstallNotes that contain \"Minimal App\" (applicatino.title)"
+}

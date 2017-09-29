@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -36,8 +37,13 @@ type Package struct {
 	UpgradesFrom          []string `json:"upgradesFrom"`
 	DowngradesTo          []string `json:"DowngradesTo"`
 	Selected              bool
-	Framework             bool `json:default=true`
+	Framework             bool
 	Description           string
+	Maintainer            string
+	Tags                  []string
+	PreInstallNotes       string
+	PostInstallNotes      string
+	PostUninstallNotes    string
 }
 
 // NewPackage constructs a new package with default values
@@ -52,23 +58,70 @@ func (c *Package) ParseYaml(data []byte) error {
 	if err := yaml.Unmarshal(data, c); err != nil {
 		return err
 	}
-	c.setDefaults()
+	c.SetDefaults(GetDefaultPackage())
 	return nil
 }
 
-func (c *Package) setDefaults() {
+func (c *Package) SetDefaults(defaultPackage Package) {
+	if c.Name == "" {
+		c.Name = defaultPackage.Name
+	}
+	if c.Description == "" {
+		if defaultPackage.Description != "" {
+			c.Description = defaultPackage.Description
+		} else {
+			c.Description = c.Name
+		}
+	}
 	if c.PackagingVersion == "" {
-		c.PackagingVersion = DefaultPackagingVerison
+		c.PackagingVersion = defaultPackage.PackagingVersion
 	}
 	if c.MinDcosReleaseVersion == "" {
-		c.MinDcosReleaseVersion = DefaultMinDcosReleaseVersion
+		c.MinDcosReleaseVersion = defaultPackage.MinDcosReleaseVersion
 	}
 	if c.UpgradesFrom == nil {
-		c.UpgradesFrom = []string{"{{upgrades-from}}"}
+		c.UpgradesFrom = defaultPackage.UpgradesFrom
 	}
 	if c.DowngradesTo == nil {
-		c.DowngradesTo = []string{"{{downgrades-to}}"}
+		c.DowngradesTo = defaultPackage.DowngradesTo
 	}
+	if c.Tags == nil {
+		if defaultPackage.Tags != nil {
+			c.Tags = defaultPackage.Tags
+		} else if c.Name != "" {
+			c.Tags = []string{c.Name}
+		}
+	}
+	if c.PreInstallNotes == "" {
+		c.PreInstallNotes = defaultPackage.PreInstallNotes
+	}
+
+	if c.PostInstallNotes == "" {
+		if defaultPackage.PostInstallNotes != "" {
+			c.PostInstallNotes = defaultPackage.PostInstallNotes
+		} else if c.Description != "" {
+			c.PostInstallNotes = fmt.Sprintf("The DC/OS %s service is being installed", c.Description)
+		}
+	}
+
+	if c.PostUninstallNotes == "" {
+		if defaultPackage.PostUninstallNotes != "" {
+			c.PostUninstallNotes = defaultPackage.PostUninstallNotes
+		} else if c.Description != "" {
+			c.PostUninstallNotes = fmt.Sprintf("The DC/OS %s service is being uninstalled", c.Description)
+		}
+	}
+
+}
+
+func GetDefaultPackage() Package {
+	p := Package{}
+	p.MinDcosReleaseVersion = DefaultMinDcosReleaseVersion
+	p.PackagingVersion = DefaultPackagingVerison
+	p.UpgradesFrom = []string{"{{upgrades-from}}"}
+	p.DowngradesTo = []string{"{{downgrades-to}}"}
+	p.Framework = true
+	return p
 }
 
 func LoadYamlFile(filename string) (Package, error) {
@@ -92,6 +145,8 @@ func LoadJsonFile(filename string) (Package, error) {
 	if err != nil {
 		return p, err
 	}
+	defer file.Close()
+
 	dec := json.NewDecoder(file)
 
 	err = dec.Decode(&p)
@@ -100,4 +155,28 @@ func LoadJsonFile(filename string) (Package, error) {
 	}
 
 	return p, err
+}
+
+func (p Package) WriteToJsonFile(outputDir string) error {
+
+	outputFolder := fmt.Sprintf("%s/universe", outputDir)
+	err := os.MkdirAll(outputFolder, 0777)
+	if err != nil {
+		return err
+	}
+
+	filename := fmt.Sprintf("%s/universe/package.json", outputDir)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0777)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	enc := json.NewEncoder(file)
+	enc.SetIndent("", "  ")
+	err = enc.Encode(p)
+	if err != nil {
+		return err
+	}
+	return nil
 }

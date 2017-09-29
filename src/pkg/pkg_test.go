@@ -18,11 +18,11 @@ func TestDetaultPackageInfo(t *testing.T) {
 	assert.Equal(t, "", p.Name)
 	assert.Equal(t, DefaultPackagingVerison, p.PackagingVersion)
 	assert.Equal(t, false, p.Selected)
-	assert.Equal(t, true, p.Framework)
 	assert.Equal(t, DefaultMinDcosReleaseVersion, p.MinDcosReleaseVersion)
 	assert.Equal(t, "", p.Description)
 	assert.Equal(t, []string{"{{upgrades-from}}"}, p.UpgradesFrom)
 	assert.Equal(t, []string{"{{downgrades-to}}"}, p.DowngradesTo)
+	assert.NotEqual(t, "", p.postInstallNotes)
 }
 
 func TestDefaultPackageVersionIsCorrect(t *testing.T) {
