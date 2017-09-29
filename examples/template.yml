@@ -1,0 +1,25 @@
+name: framework-name
+maintainer: support@mesosphere.io
+title: Framework Name
+description: >
+  A longer description of what the framework does.
+
+config:
+  # This section is mapped to the config.json file. Not all properties need to
+  # be specified. Where omitted, default values will be used.
+
+
+package:
+  # The section is mapped to the package.json file. Not all properties need to
+  # be specifed. Where omitted, default values will be used.
+
+resources:
+  # This section is mapped to the resource.json file. Not all properties need to
+  # be specifed. Where omitted, default values will be used.
+
+scheduler:
+  # This section describes how the scheduler should be built.
+
+
+service:
+  # This section is mapped to a svc.yml file.
