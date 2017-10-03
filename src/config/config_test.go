@@ -2,15 +2,15 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"testing"
 )
 
 func TestJsonSchema(t *testing.T) {
-	str, err := GenerateJsonSchema()
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	c := Config{}
+	c.SetDefaults("serviceName")
+
+	str := GenerateJsonSchema(c)
 
 	fmt.Println()
 	fmt.Println(str)

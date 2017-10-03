@@ -7,7 +7,11 @@ import (
 )
 
 func generateConfigJson(a application.Application, outputPath string) {
-	log.Println("TODO: Generate config.json")
+	log.Println("Generating config.json")
+	err := a.Config.WriteToJsonFile(outputPath)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateMarathonJsonMustache(a application.Application, outputPath string) {

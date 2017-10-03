@@ -2,9 +2,9 @@ package application
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 
+	"github.com/elezar/create-dcos-app/src/config"
 	"github.com/elezar/create-dcos-app/src/pkg"
 
 	yaml "gopkg.in/yaml.v2"
@@ -15,6 +15,7 @@ type Application struct {
 	Title      string
 	Maintainer string
 	Package    pkg.Package
+	Config     config.Config
 }
 
 func (c *Application) ParseYaml(data []byte) error {
@@ -45,8 +46,10 @@ func (c *Application) SetDefaults() {
 	defaultPackage.Name = c.Name
 	defaultPackage.Maintainer = c.Maintainer
 	defaultPackage.Description = c.Title
-	fmt.Println(defaultPackage)
 	c.Package.SetDefaults(defaultPackage)
+
+	c.Config.SetDefaults(c.Name)
+
 }
 
 func LoadApplicationYaml(filename string) (Application, error) {
